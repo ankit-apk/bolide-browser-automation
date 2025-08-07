@@ -1,0 +1,218 @@
+/* Overlay styles for AI automation visual feedback */
+
+.ai-overlay-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ai-overlay-container.visible {
+    opacity: 1;
+}
+
+.ai-action-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    min-width: 250px;
+    max-width: 400px;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    margin-bottom: 10px;
+}
+
+.ai-action-display.active {
+    transform: translateX(0);
+}
+
+.action-type {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.action-description {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.action-target,
+.action-text {
+    font-size: 13px;
+    opacity: 0.85;
+    margin-top: 5px;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+}
+
+.ai-progress-indicator {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    min-width: 250px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transition: width 0.3s ease;
+    border-radius: 3px;
+}
+
+.progress-status {
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+}
+
+/* Click indicator styles */
+.ai-click-marker {
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    margin-left: -15px;
+    margin-top: -15px;
+    pointer-events: none;
+    z-index: 999998;
+}
+
+.ai-click-marker::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: #667eea;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+}
+
+.ai-click-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border: 2px solid #667eea;
+    border-radius: 50%;
+    animation: ripple-animation 1s ease-out;
+}
+
+@keyframes ripple-animation {
+    0% {
+        width: 30px;
+        height: 30px;
+        opacity: 1;
+    }
+    100% {
+        width: 80px;
+        height: 80px;
+        opacity: 0;
+    }
+}
+
+/* Element highlight styles */
+.ai-element-highlight {
+    border: 3px solid #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 4px;
+    animation: pulse-highlight 1s ease-in-out infinite;
+}
+
+@keyframes pulse-highlight {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(102, 126, 234, 0.8);
+    }
+}
+
+/* Tooltip styles for hover information */
+.ai-tooltip {
+    position: fixed;
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 999997;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.ai-tooltip.visible {
+    opacity: 1;
+}
+
+/* Loading spinner */
+.ai-spinner {
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999999;
+}
+
+.ai-spinner::after {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 32px;
+    margin: 4px;
+    border-radius: 50%;
+    border: 3px solid #667eea;
+    border-color: #667eea transparent #667eea transparent;
+    animation: spinner-rotation 1.2s linear infinite;
+}
+
+@keyframes spinner-rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .ai-progress-indicator {
+        background: #2a2a2a;
+        color: #e0e0e0;
+    }
+    
+    .progress-bar {
+        background: #444;
+    }
+    
+    .progress-status {
+        color: #bbb;
+    }
+}

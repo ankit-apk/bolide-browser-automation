@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Brain Control</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            margin: 10px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .brain-icon {
+            font-size: 32px;
+            animation: pulse 2s infinite;
+        }
+        
+        .header-content h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.disconnected {
+            background: #94a3b8;
+            animation: none;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #475569;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .tab-content.active {
+            display: flex;
+        }
+        
+        /* Task Input Section */
+        .task-input-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .task-input-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .task-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .task-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .task-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .task-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .task-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Workflow Display */
+        .workflow-display {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .workflow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .workflow-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .workflow-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .workflow-status.planning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .workflow-status.executing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .workflow-status.complete {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .workflow-step.active {
+            background: #eef2ff;
+            border-left: 3px solid #667eea;
+        }
+        
+        .workflow-step.complete {
+            opacity: 0.7;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+        }
+        
+        .step-number.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .step-number.complete {
+            background: #4ade80;
+            color: white;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 2px;
+        }
+        
+        .step-description {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        /* Memory Display */
+        .memory-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .memory-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        
+        .memory-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .memory-card-content {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        
+        .memory-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .memory-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .memory-list li:last-child {
+            border-bottom: none;
+        }
+        
+        /* Settings */
+        .settings-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .setting-group {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .setting-group-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-label {
+            font-size: 14px;
+            color: #475569;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #cbd5e1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #667eea;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+        
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .message.human .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .message.ai .message-avatar {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .message-content {
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .message-content.thinking {
+            background: linear-gradient(90deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* API Key Setup */
+        .api-key-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+        
+        .api-key-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .api-key-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .api-key-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brain-icon">🧠</div>
+            <div class="header-content">
+                <h1>AI Brain Control System</h1>
+                <div class="status-bar">
+                    <span class="status-indicator disconnected" id="statusIndicator"></span>
+                    <span id="statusText">Not connected</span>
+                    <span id="workflowState" style="margin-left: 10px;">• Idle</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="control">Control</div>
+            <div class="tab" data-tab="workflow">Workflow</div>
+            <div class="tab" data-tab="memory">Memory</div>
+            <div class="tab" data-tab="settings">Settings</div>
+        </div>
+        
+        <!-- Control Tab -->
+        <div class="tab-content active" id="control">
+            <div class="api-key-section">
+                <input type="password" class="api-key-input" id="apiKey" placeholder="Enter your Gemini API key">
+                <button class="api-key-button" id="saveApiKey">Save API Key</button>
+            </div>
+            
+            <div class="task-input-section">
+                <label class="task-input-label">What would you like me to do?</label>
+                <div class="task-input-wrapper">
+                    <input type="text" class="task-input" id="taskInput" placeholder="e.g., Find the best laptop under $1000">
+                    <button class="task-button" id="startTask">Start</button>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will appear here -->
+            </div>
+        </div>
+        
+        <!-- Workflow Tab -->
+        <div class="tab-content" id="workflow">
+            <div class="workflow-display">
+                <div class="workflow-header">
+                    <div class="workflow-title">Current Workflow</div>
+                    <div class="workflow-status planning" id="workflowStatus">Planning</div>
+                </div>
+                <div class="workflow-steps" id="workflowSteps">
+                    <!-- Steps will appear here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Memory Tab -->
+        <div class="tab-content" id="memory">
+            <div class="memory-section">
+                <div class="memory-card">
+                    <div class="memory-card-title">
+                        <span>📝</span> Recent Tasks
+                    </div>
+                    <div class="memory-card-content">
+                        <ul class="memory-list" id="recentTasks">
+                            <li>No recent tasks</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="memory-card">
+                    <div class="memory-card-title">
+                        <span>🌐</span> Known Websites
+                    </div>
+                    <div class="memory-card-content">
+                        <ul class="memory-list" id="knownWebsites">
+                            <li>No websites learned yet</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="memory-card">
+                    <div class="memory-card-title">
+                        <span>✅</span> Successful Patterns
+                    </div>
+                    <div class="memory-card-content">
+                        <ul class="memory-list" id="successfulPatterns">
+                            <li>No patterns learned yet</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="memory-card">
+                    <div class="memory-card-title">
+                        <span>📊</span> Statistics
+                    </div>
+                    <div class="memory-card-content" id="statistics">
+                        Tasks completed: 0<br>
+                        Success rate: 0%<br>
+                        Time saved: 0 min
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings">
+            <div class="settings-section">
+                <div class="setting-group">
+                    <div class="setting-group-title">Behavior Rules</div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Always think before acting</span>
+                        <div class="toggle-switch active" data-setting="alwaysThinkFirst"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Explain reasoning</span>
+                        <div class="toggle-switch active" data-setting="explainReasoning"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Learn from mistakes</span>
+                        <div class="toggle-switch active" data-setting="learnFromMistakes"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Ask for clarification</span>
+                        <div class="toggle-switch active" data-setting="askForClarification"></div>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <div class="setting-group-title">Safety Rules</div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Never auto-submit forms</span>
+                        <div class="toggle-switch active" data-setting="neverAutoSubmitForms"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Never enter passwords</span>
+                        <div class="toggle-switch active" data-setting="neverEnterPasswords"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Never make payments</span>
+                        <div class="toggle-switch active" data-setting="neverMakePayments"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Warn before dangerous actions</span>
+                        <div class="toggle-switch active" data-setting="warnBeforeDangerous"></div>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <div class="setting-group-title">Performance</div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Screenshot before actions</span>
+                        <div class="toggle-switch active" data-setting="screenshotBeforeAction"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Verify after actions</span>
+                        <div class="toggle-switch active" data-setting="verifyAfterAction"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Use fallback strategies</span>
+                        <div class="toggle-switch active" data-setting="fallbackStrategies"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="advanced-ui.js"></script>
+</body>
+</html>

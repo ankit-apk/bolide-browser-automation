@@ -1,0 +1,87 @@
+{
+  "manifest_version": 3,
+  "name": "AI Brain - Advanced Browser Control",
+  "version": "2.0.0",
+  "description": "Advanced AI-powered browser automation with human-like reasoning",
+  
+  "permissions": [
+    "activeTab",
+    "alarms",
+    "bookmarks",
+    "browsingData",
+    "contextMenus",
+    "cookies",
+    "downloads",
+    "history",
+    "idle",
+    "notifications",
+    "power",
+    "scripting",
+    "search",
+    "sidePanel",
+    "storage",
+    "tabs",
+    "webNavigation",
+    "webRequest"
+  ],
+  
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  
+  "background": {
+    "service_worker": "ai-brain-system.js"
+  },
+  
+  "action": {
+    "default_title": "AI Brain Control",
+    "default_icon": {
+      "16": "icon-16.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
+  },
+  
+  "side_panel": {
+    "default_path": "advanced-ui.html"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["intelligent-controller.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  
+  "commands": {
+    "activate-ai": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+A",
+        "mac": "Command+Shift+A"
+      },
+      "description": "Activate AI assistant"
+    },
+    "quick-task": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Q",
+        "mac": "Command+Shift+Q"
+      },
+      "description": "Quick task input"
+    },
+    "stop-all": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Stop all automation"
+    }
+  },
+  
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}

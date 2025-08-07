@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Web Automation</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Web Assistant</h1>
+        
+        <div class="api-section">
+            <label for="apiKey">Gemini API Key:</label>
+            <input type="password" id="apiKey" placeholder="Enter your API key">
+            <button id="saveApiKey">Save</button>
+        </div>
+
+        <div class="task-section">
+            <label for="taskInput">What would you like me to do?</label>
+            <textarea id="taskInput" rows="3" placeholder="e.g., Book a flight to London, Fill out this form, Find the cheapest hotel..."></textarea>
+            
+            <div class="controls">
+                <button id="startTask" class="primary-btn">Start Task</button>
+                <button id="stopTask" class="danger-btn" disabled>Stop</button>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <div id="status" class="status-message"></div>
+            <div id="currentAction" class="current-action"></div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3>Recent Tasks</h3>
+            <ul id="taskHistory"></ul>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

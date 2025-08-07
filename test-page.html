@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Extension Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input, select, textarea, button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        #result {
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 AI Browser Control Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Test Form Elements</h2>
+        
+        <input type="text" id="nameInput" name="q" placeholder="Enter your name">
+        
+        <input type="email" id="emailInput" placeholder="Enter your email">
+        
+        <select id="colorSelect" name="color">
+            <option value="">Choose a color</option>
+            <option value="red">Red</option>
+            <option value="blue">Blue</option>
+            <option value="green">Green</option>
+        </select>
+        
+        <textarea id="messageText" placeholder="Enter a message" rows="4"></textarea>
+        
+        <label>
+            <input type="checkbox" id="agreeCheck"> I agree to the terms
+        </label>
+        
+        <button id="submitBtn" onclick="handleSubmit()">Submit Form</button>
+        
+        <button id="clearBtn" onclick="clearForm()">Clear Form</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Navigation Tests</h2>
+        <button onclick="window.location.href='https://www.google.com'">Go to Google</button>
+        <button onclick="alert('Alert triggered!')">Show Alert</button>
+        <button onclick="scrollToBottom()">Scroll to Bottom</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Result Display</h2>
+        <div id="result">No results yet. Submit the form to see results.</div>
+    </div>
+    
+    <div style="height: 1000px; text-align: center; padding-top: 400px;">
+        <h2>Bottom of Page</h2>
+        <button onclick="scrollToTop()">Scroll to Top</button>
+    </div>
+    
+    <script>
+        function handleSubmit() {
+            const name = document.getElementById('nameInput').value;
+            const email = document.getElementById('emailInput').value;
+            const color = document.getElementById('colorSelect').value;
+            const message = document.getElementById('messageText').value;
+            const agreed = document.getElementById('agreeCheck').checked;
+            
+            const result = `
+                <h3>Form Submitted!</h3>
+                <p><strong>Name:</strong> ${name || 'Not provided'}</p>
+                <p><strong>Email:</strong> ${email || 'Not provided'}</p>
+                <p><strong>Color:</strong> ${color || 'Not selected'}</p>
+                <p><strong>Message:</strong> ${message || 'No message'}</p>
+                <p><strong>Agreed:</strong> ${agreed ? 'Yes' : 'No'}</p>
+            `;
+            
+            document.getElementById('result').innerHTML = result;
+        }
+        
+        function clearForm() {
+            document.getElementById('nameInput').value = '';
+            document.getElementById('emailInput').value = '';
+            document.getElementById('colorSelect').value = '';
+            document.getElementById('messageText').value = '';
+            document.getElementById('agreeCheck').checked = false;
+            document.getElementById('result').innerHTML = 'Form cleared!';
+        }
+        
+        function scrollToBottom() {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+</body>
+</html>
