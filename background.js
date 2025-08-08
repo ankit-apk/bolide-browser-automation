@@ -279,6 +279,15 @@ function executeActionsWithContinuation() {
 
     function handleActionResponse(response) {
         if (response && response.success) {
+            // If content script signaled completion, end workflow
+            if (response.complete || action.type === 'complete') {
+                sendWorkflowUpdate({
+                    log: `✅ Task complete: ${action.description || action.message || ''}`,
+                    logType: 'success'
+                });
+                completeWorkflow(true, action.description || 'Task completed');
+                return;
+            }
             completedActions.push(action.description);
             currentActionIndex++;
             
@@ -506,10 +515,11 @@ async function analyzeWithGemini(task, screenshot, apiKey, tabUrl = '') {
                         3. Example: If task is "find coffee", you must type "coffee" only
                         
                         IMPORTANT:
-                        - Click the search input first
+                        - If the task names a specific site/domain (e.g., amazon.in, linkedin.com), NAVIGATE there first and use that site's search
+                        - Click the search input first (avoid voice/mic buttons); on Google prefer textarea[name="q"] or input[name="q"]
                         - Type EXACTLY the search term: "${searchTerm}"
                         - Do NOT type "${task}"
-                        - Submit the search
+                        - Submit the search using a press action (see below)
                         
                         Current page: ${tabUrl || 'unknown'}
                         
@@ -527,6 +537,7 @@ async function analyzeWithGemini(task, screenshot, apiKey, tabUrl = '') {
                         5. "wait" - Wait for loading {"type": "wait", "duration": 2000, "description": "..."}
                         6. "scroll" - Scroll page {"type": "scroll", "direction": "down", "amount": 300}
                         7. "select" - Select dropdown {"type": "select", "selector": "...", "value": "..."}
+                        8. "complete" - Mark task done {"type": "complete", "message": "what was accomplished"}
                         
                         EXAMPLES - FOLLOW THESE EXACTLY:
                         
@@ -561,11 +572,12 @@ async function analyzeWithGemini(task, screenshot, apiKey, tabUrl = '') {
                         
                         IMPORTANT RULES:
                         1. ALWAYS think about the complete user journey, not just one action
-                        2. If not on the right website for the task, include navigation first
-                        3. Include wait actions after any action that causes page changes
-                        4. For search tasks: navigate → click input → type → submit → wait for results
-                        5. Be thorough - include ALL steps a human would take
-                        6. Return ONLY the JSON array, no other text
+                        2. If the task references a specific website, navigate there first and use its own search
+                        3. Include "wait" actions after any action that causes page changes (navigate, press_enter, result clicks)
+                        4. For search tasks: navigate (site if specified) → click input → type → press_enter → wait for results
+                        5. Avoid voice search UIs; select text inputs (textarea[name="q"], input[name="q"]) rather than mic buttons
+                        6. Use "complete" with a clear message when the goal is achieved
+                        7. Return ONLY the JSON array, no other text
                         
                         Analyze the current page and generate the complete action sequence:`
                     },

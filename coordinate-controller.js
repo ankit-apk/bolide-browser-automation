@@ -338,20 +338,13 @@
         }
         
         // Dispatch all necessary events
-        const events = [
-            new Event('input', { bubbles: true, composed: true }),
-            new Event('change', { bubbles: true, composed: true }),
-            new InputEvent('input', { 
-                bubbles: true, 
-                cancelable: true,
-                inputType: 'insertText',
-                data: text 
-            })
-        ];
-        
-        for (const event of events) {
-            activeElement.dispatchEvent(event);
-        }
+        // Dispatch safe input/change events and guard InputEvent to avoid Illegal invocation
+        activeElement.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+        try {
+            const inputEvt = new InputEvent('input', { bubbles: true, cancelable: true, inputType: 'insertText', data: text });
+            activeElement.dispatchEvent(inputEvt);
+        } catch (e) {}
+        activeElement.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
         
         // Force React to recognize the change
         const tracker = activeElement._valueTracker;
@@ -652,6 +645,9 @@
                     
                     return { success: true, forms: analysis };
                     
+                case 'complete':
+                    return { success: true, complete: true };
+                
                 default:
                     return { success: false, error: 'Unknown action type: ' + action.type };
             }

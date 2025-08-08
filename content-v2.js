@@ -135,6 +135,10 @@ class DOMAutomation {
                     
                 case 'press_enter':
                     return await this.pressEnter(action);
+                
+                case 'complete':
+                    // Allow AI to signal completion without erroring
+                    return { success: true, complete: true };
                     
                 default:
                     throw new Error(`Unknown action type: ${action.type}`);
@@ -201,6 +205,16 @@ class DOMAutomation {
                 cancelable: true
             }));
         });
+        // Guard InputEvent creation to prevent Illegal invocation in some contexts
+        try {
+            const inputEvt = new InputEvent('input', {
+                bubbles: true,
+                cancelable: true,
+                data: element.value || '',
+                inputType: 'insertText'
+            });
+            element.dispatchEvent(inputEvt);
+        } catch (e) {}
         
         return { success: true };
     }

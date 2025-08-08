@@ -583,6 +583,9 @@
                     }
                     return { success: false, error: 'Element not found' };
                     
+                case 'complete':
+                    return { success: true, complete: true };
+                
                 default:
                     return { success: false, error: 'Unknown action type' };
             }

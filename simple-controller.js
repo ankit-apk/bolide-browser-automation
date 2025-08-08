@@ -58,6 +58,9 @@
                 case 'wait':
                     await sleep(action.duration || 2000);
                     return { success: true };
+                
+                case 'complete':
+                    return { success: true, complete: true };
                     
                 default:
                     return { success: false, error: 'Unknown action type' };

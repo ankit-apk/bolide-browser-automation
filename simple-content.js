@@ -114,6 +114,9 @@
                 case 'navigate':
                     return await navigateTo(value);
                 
+                case 'complete':
+                    return true;
+                
                 default:
                     console.error(`Unknown action: ${action}`);
                     throw new Error(`Unknown action: ${action}`);

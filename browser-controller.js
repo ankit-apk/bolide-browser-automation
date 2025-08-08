@@ -75,6 +75,11 @@
                 case 'check':
                     result = await checkElement(action.selector, action.checked);
                     break;
+            
+            case 'complete':
+                // No-op to acknowledge completion
+                result = { message: 'Task complete signal received' };
+                break;
                     
                 default:
                     throw new Error(`Unknown action: ${actionType}`);
@@ -239,6 +244,11 @@
 
         // Trigger input events
         element.dispatchEvent(new Event('input', { bubbles: true }));
+        // Guard InputEvent creation to avoid Illegal invocation in some sites
+        try {
+            const inputEvt = new InputEvent('input', { bubbles: true, cancelable: true, data: text || '', inputType: 'insertText' });
+            element.dispatchEvent(inputEvt);
+        } catch (e) {}
         element.dispatchEvent(new Event('change', { bubbles: true }));
 
         return { message: `Typed: ${text}` };

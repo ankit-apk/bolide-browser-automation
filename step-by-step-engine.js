@@ -388,6 +388,12 @@ class StepByStepAutomationEngine {
             this.notify('message', `🤔 ${response.thought}`);
         }
 
+        // If AI signals completion, handle it immediately
+        if (actionType === 'complete') {
+            this.handleTaskComplete({ message: response.action.message || 'Task completed' });
+            return;
+        }
+
         // Execute the action
         const success = await this.executeAction(response.action);
         
@@ -420,11 +426,19 @@ class StepByStepAutomationEngine {
             const scriptReady = await this.ensureContentScript();
             console.log('Content script ready:', scriptReady);
             
+            // Normalize action for content script compatibility
+            const normalized = { ...action };
+            if ((normalized.type || normalized.action) === 'press_enter') {
+                normalized.type = 'press';
+                normalized.key = 'Enter';
+                delete normalized.action;
+            }
+
             // Send action to content script
             console.log('Sending action to content script...');
             const response = await chrome.tabs.sendMessage(this.activeTabId, {
                 action: 'EXECUTE_ACTION',
-                data: action
+                data: normalized
             });
             
             console.log('Content script response:', response);
@@ -439,12 +453,12 @@ class StepByStepAutomationEngine {
                 await this.sleep(500);
                 
                 try {
-                    const response = await chrome.tabs.sendMessage(this.activeTabId, {
+                    const retryResponse = await chrome.tabs.sendMessage(this.activeTabId, {
                         action: 'EXECUTE_ACTION',
-                        data: action
+                        data: normalized
                     });
-                    console.log('Retry response:', response);
-                    return response.success;
+                    console.log('Retry response:', retryResponse);
+                    return retryResponse.success;
                 } catch (retryError) {
                     console.error('Retry failed:', retryError);
                     return false;
@@ -734,28 +748,28 @@ When asked for an action, respond with:
 {
   "thought": "What I'm doing",
   "action": {
-    "type": "navigate|click|type|wait",
-    "url": "https://maps.google.com (for navigate)",
-    "selector": "Search (for click/type)",
-    "text": "text to type (for type)"
+    "type": "navigate|click|type|wait|press_enter|complete",
+    "url": "https://example.com (for navigate)",
+    "selector": "CSS selector or visible text (for click/type)",
+    "text": "text to type (for type)",
+    "message": "What was accomplished (for complete)"
   }
 }
 
-ACTION EXAMPLES:
-Navigate: {"type": "navigate", "url": "https://maps.google.com"}
-Click: {"type": "click", "selector": "Search"}
-Type: {"type": "type", "selector": "Search", "text": "Manali"}
+RULES:
+- If the task names a specific site/domain (e.g., amazon.in, linkedin.com), NAVIGATE there first
+- Prefer text inputs (textarea[name="q"], input[name="q"]) and avoid voice/mic buttons
+- After typing in a search box, use press_enter, then add a wait of ~1500-2000ms
+- Include wait after any navigation or page-changing click
+- Use complete when the goal is achieved, with a clear message
+
+EXAMPLES:
+Navigate: {"type": "navigate", "url": "https://www.amazon.in"}
+Click: {"type": "click", "selector": "input[name='q']"}
+Type: {"type": "type", "selector": "input[name='q']", "text": "rich dad poor dad"}
+Press Enter: {"type": "press_enter"}
 Wait: {"type": "wait", "time": 2000}
-
-SELECTOR TIPS:
-- Use button/link text: "Search", "Directions"
-- Use placeholder text: "Search Google Maps"
-- Use simple words that appear on screen
-
-IMPORTANT:
-- ONE action at a time
-- Start with navigate if going to a new site
-- Use wait after navigate (2000ms)`;
+Complete: {"type": "complete", "message": "On Amazon.in product page for Rich Dad Poor Dad"}`;
     }
 }
 

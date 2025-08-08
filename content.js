@@ -167,6 +167,10 @@ async function executeAction(actionData, showOverlay = true) {
             case 'wait':
                 return await performWait(actionData);
             
+            case 'complete':
+                // Gracefully accept completion signals without DOM interaction
+                return { success: true, complete: true };
+            
             default:
                 throw new Error(`Unknown action type: ${actionData.type}`);
         }
@@ -350,12 +354,18 @@ async function performType(actionData) {
             
             // Dispatch events for compatibility
             element.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-            element.dispatchEvent(new InputEvent('input', { 
-                bubbles: true, 
-                cancelable: true,
-                data: actionData.text,
-                inputType: 'insertText'
-            }));
+            // Some environments disallow constructing InputEvent; guard to avoid Illegal invocation
+            try {
+                const inputEvt = new InputEvent('input', {
+                    bubbles: true,
+                    cancelable: true,
+                    data: actionData.text,
+                    inputType: 'insertText'
+                });
+                element.dispatchEvent(inputEvt);
+            } catch (e) {
+                // Fallback: already dispatched a generic input event
+            }
             
             // Dispatch change and blur events at the end
             element.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
