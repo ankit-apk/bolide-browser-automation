@@ -219,6 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Start multi-tab workflow
+    const startMultiTabBtn = document.getElementById('startMultiTab');
     startMultiTabBtn.addEventListener('click', async function() {
         const task = taskInput.value.trim();
         

@@ -421,18 +421,18 @@ class StepByStepAutomationEngine {
     async executeAction(action) {
         console.log('executeAction called with:', action);
         
+        // Normalize action for content script compatibility
+        const normalized = { ...action };
+        if ((normalized.type || normalized.action) === 'press_enter') {
+            normalized.type = 'press';
+            normalized.key = 'Enter';
+            delete normalized.action;
+        }
+
         try {
             // Ensure content script is ready
             const scriptReady = await this.ensureContentScript();
             console.log('Content script ready:', scriptReady);
-            
-            // Normalize action for content script compatibility
-            const normalized = { ...action };
-            if ((normalized.type || normalized.action) === 'press_enter') {
-                normalized.type = 'press';
-                normalized.key = 'Enter';
-                delete normalized.action;
-            }
 
             // Send action to content script
             console.log('Sending action to content script...');

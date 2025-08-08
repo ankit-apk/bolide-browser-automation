@@ -1,0 +1,21 @@
+{
+  "name": "ai-web-automation-extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered browser automation Chrome extension (Gemini)",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint . --ext .js",
+    "format": "prettier -w .",
+    "format:check": "prettier -c ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "prettier": "^3.6.2"
+  }
+}
